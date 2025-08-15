@@ -32,45 +32,99 @@ function loadState() {
     })
   })
 }
+/**
+ * Trunca o texto de parágrafos que excedem um limite de caracteres,
+ * adicionando a opção de "Ler mais" para exibir o conteúdo completo.
+ */
+document.addEventListener("DOMContentLoaded", function () {
+  const elements = document.querySelectorAll(".cards p")
+  const limit = 70
 
-const elements = document.querySelectorAll(".cards p")
-const limit = 70
-for (let p of elements) {
-  const originalText = p.innerText // Guarda o texto original
-  const aboveLimit = originalText.length > limit
-  // Salva o texto original em um atributo de dado
-  p.dataset.fullText = originalText
+  // --- Parte 1: Lógica de Truncamento Inicial e Criação da Estrutura ---
+  for (let p of elements) {
+    const originalText = p.innerText.trim() // .trim() remove espaços em branco no início e fim
 
-  if (aboveLimit) {
-    // Trunca o texto apenas se for maior que o limite
-    p.innerText = originalText.substring(0, limit) + "..."
+    if (originalText.length > limit) {
+      // Armazena o texto original em um atributo de dado
+      p.dataset.fullText = originalText
+
+      // Cria a versão truncada do texto
+      const truncatedText = originalText.substring(0, limit)
+
+      // Insere a estrutura completa com spans para o texto truncado e completo
+      // e o link "Ler mais"
+      p.innerHTML = `
+                <span class="truncated-text">${truncatedText}</span>
+                <span class="full-text" style="display: none;">${originalText}</span>
+                <span class="read-more-container">
+                    <a href="#" class="read-more-link">... Ler mais</a>
+                </span>
+            `
+    }
   }
 
-  // Adiciona uma classe para indicar que o card é clicável
-  p.parentElement.classList.add("clickable-card")
-}
-const cards = document.querySelectorAll(".cards .clickable-card")
+  // --- Parte 2: Lógica de Alternância de Conteúdo (esconder/exibir) ---
+  // Seleciona todos os links "Ler mais" criados na etapa anterior
+  const readMoreLinks = document.querySelectorAll(".read-more-link")
 
-// Adiciona um evento de clique a cada card
-cards.forEach((card) => {
-  card.addEventListener("click", () => {
-    // Encontra o parágrafo dentro do card clicado
-    const p = card.querySelector("p")
+  readMoreLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      // Impede a ação padrão do link (evita que a página recarregue)
+      event.preventDefault()
 
-    // Pega o texto completo do atributo de dado
-    const fullText = p.dataset.fullText
+      // Encontra o parágrafo pai (o card) a partir do link clicado
+      const p = link.closest("p")
+      if (!p) return // Garante que o parágrafo foi encontrado
 
-    // Pega o texto truncado (o que está na tela)
-    const currentText = p.innerText
+      const truncatedSpan = p.querySelector(".truncated-text")
+      const fullSpan = p.querySelector(".full-text")
+      const readMoreContainer = p.querySelector(".read-more-container")
 
-    // Se o texto exibido for o truncado, mostra o completo
-    if (currentText.endsWith("...")) {
-      p.innerText = fullText
-    } else {
-      // Se o texto exibido for o completo, retorna para o truncado
-      const aboveLimit = fullText.length > limit
-      const dotsOrEmpty = aboveLimit ? "..." : ""
-      p.innerText = fullText.substring(0, limit) + dotsOrEmpty
-    }
+      // Alterna a visibilidade dos elementos
+      if (fullSpan.style.display === "none") {
+        // Se o texto completo estiver escondido, o exibe
+        fullSpan.style.display = "inline"
+        truncatedSpan.style.display = "none"
+        readMoreContainer.style.display = "none"
+      } else {
+        // Se o texto completo estiver visível, o esconde e exibe o truncado
+        fullSpan.style.display = "none"
+        truncatedSpan.style.display = "inline"
+        readMoreContainer.style.display = "inline"
+      }
+    })
+  })
+
+  // --- Parte 3 (Adicional): Lógica para Ler Menos (opcional) ---
+  // Você pode adicionar um link "Ler menos" dinamicamente
+  // quando o texto completo for exibido.
+  // Esta parte é um pouco mais complexa e, para a primeira versão,
+  // o ideal é que o clique em qualquer parte do texto completo
+  // o retorne ao estado original.
+
+  // Abaixo está uma implementação alternativa para "Ler menos"
+  // que se baseia em um segundo clique no próprio parágrafo
+  // após o texto ser expandido.
+
+  const cards = document.querySelectorAll(".cards p")
+
+  cards.forEach((card) => {
+    card.addEventListener("click", (event) => {
+      const truncatedSpan = card.querySelector(".truncated-text")
+      const fullSpan = card.querySelector(".full-text")
+      const readMoreContainer = card.querySelector(".read-more-container")
+
+      // Se o texto completo estiver visível, e o clique não for no link "Ler mais",
+      // oculta o texto completo.
+      if (
+        fullSpan &&
+        fullSpan.style.display !== "none" &&
+        !event.target.classList.contains("read-more-link")
+      ) {
+        fullSpan.style.display = "none"
+        truncatedSpan.style.display = "inline"
+        readMoreContainer.style.display = "inline"
+      }
+    })
   })
 })
