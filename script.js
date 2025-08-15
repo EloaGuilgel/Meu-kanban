@@ -38,11 +38,11 @@ function loadState() {
  */
 document.addEventListener("DOMContentLoaded", function () {
   const elements = document.querySelectorAll(".cards p")
-  const limit = 70
+  const limit = 60
 
   // --- Parte 1: Lógica de Truncamento Inicial e Criação da Estrutura ---
   for (let p of elements) {
-    const originalText = p.innerText.trim() // .trim() remove espaços em branco no início e fim
+    const originalText = p.innerText.trim()
 
     if (originalText.length > limit) {
       // Armazena o texto original em um atributo de dado
@@ -51,8 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Cria a versão truncada do texto
       const truncatedText = originalText.substring(0, limit)
 
-      // Insere a estrutura completa com spans para o texto truncado e completo
-      // e o link "Ler mais"
+      // Insere a estrutura inicial com o texto truncado e o link "Ler mais"
       p.innerHTML = `
                 <span class="truncated-text">${truncatedText}</span>
                 <span class="full-text" style="display: none;">${originalText}</span>
@@ -64,67 +63,95 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // --- Parte 2: Lógica de Alternância de Conteúdo (esconder/exibir) ---
-  // Seleciona todos os links "Ler mais" criados na etapa anterior
+  // Adiciona o evento de clique a todos os links "Ler mais"
   const readMoreLinks = document.querySelectorAll(".read-more-link")
 
   readMoreLinks.forEach((link) => {
     link.addEventListener("click", (event) => {
-      // Impede a ação padrão do link (evita que a página recarregue)
       event.preventDefault()
 
-      // Encontra o parágrafo pai (o card) a partir do link clicado
       const p = link.closest("p")
-      if (!p) return // Garante que o parágrafo foi encontrado
+      if (!p) return
 
-      const truncatedSpan = p.querySelector(".truncated-text")
-      const fullSpan = p.querySelector(".full-text")
-      const readMoreContainer = p.querySelector(".read-more-container")
+      const fullText = p.dataset.fullText
 
-      // Alterna a visibilidade dos elementos
-      if (fullSpan.style.display === "none") {
-        // Se o texto completo estiver escondido, o exibe
-        fullSpan.style.display = "inline"
-        truncatedSpan.style.display = "none"
-        readMoreContainer.style.display = "none"
-      } else {
-        // Se o texto completo estiver visível, o esconde e exibe o truncado
-        fullSpan.style.display = "none"
-        truncatedSpan.style.display = "inline"
-        readMoreContainer.style.display = "inline"
-      }
+      // Substitui o conteúdo do parágrafo pelo texto completo + link "Ler menos"
+      p.innerHTML = `
+                <span class="full-text">${fullText}</span>
+                <span class="read-less-container">
+                    <a href="#" class="read-less-link">Ler menos</a>
+                </span>
+            `
+
+      // Encontra o novo link "Ler menos" e adiciona o evento de clique a ele
+      const readLessLink = p.querySelector(".read-less-link")
+      readLessLink.addEventListener("click", (e) => {
+        e.preventDefault()
+
+        // Retorna ao estado original (truncado)
+        const originalText = p.dataset.fullText
+        const truncatedText = originalText.substring(0, limit)
+
+        p.innerHTML = `
+                    <span class="truncated-text">${truncatedText}</span>
+                    <span class="full-text" style="display: none;">${originalText}</span>
+                    <span class="read-more-container">
+                        <a href="#" class="read-more-link">... Ler mais</a>
+                    </span>
+                `
+        // Recarrega a página para re-ativar os eventos (não é o ideal, mas funciona)
+        // location.reload();
+
+        // Melhor abordagem: uma função que re-adiciona os eventos
+        addReadMoreEvents()
+      })
     })
   })
 
-  // --- Parte 3 (Adicional): Lógica para Ler Menos (opcional) ---
-  // Você pode adicionar um link "Ler menos" dinamicamente
-  // quando o texto completo for exibido.
-  // Esta parte é um pouco mais complexa e, para a primeira versão,
-  // o ideal é que o clique em qualquer parte do texto completo
-  // o retorne ao estado original.
+  // Função para re-adicionar eventos de clique, caso o DOM seja modificado
+  function addReadMoreEvents() {
+    const newReadMoreLinks = document.querySelectorAll(".read-more-link")
+    newReadMoreLinks.forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault()
 
-  // Abaixo está uma implementação alternativa para "Ler menos"
-  // que se baseia em um segundo clique no próprio parágrafo
-  // após o texto ser expandido.
+        const p = link.closest("p")
+        if (!p) return
 
-  const cards = document.querySelectorAll(".cards p")
+        const fullText = p.dataset.fullText
 
-  cards.forEach((card) => {
-    card.addEventListener("click", (event) => {
-      const truncatedSpan = card.querySelector(".truncated-text")
-      const fullSpan = card.querySelector(".full-text")
-      const readMoreContainer = card.querySelector(".read-more-container")
-
-      // Se o texto completo estiver visível, e o clique não for no link "Ler mais",
-      // oculta o texto completo.
-      if (
-        fullSpan &&
-        fullSpan.style.display !== "none" &&
-        !event.target.classList.contains("read-more-link")
-      ) {
-        fullSpan.style.display = "none"
-        truncatedSpan.style.display = "inline"
-        readMoreContainer.style.display = "inline"
-      }
+        p.innerHTML = `
+                    <span class="full-text">${fullText}</span>
+                    <span class="read-less-container">
+                        <a href="#" class="read-less-link">Ler menos</a>
+                    </span>
+                `
+        addReadLessEvents()
+      })
     })
-  })
+  }
+
+  // Função para adicionar os eventos de clique para o "Ler menos"
+  function addReadLessEvents() {
+    const readLessLinks = document.querySelectorAll(".read-less-link")
+    readLessLinks.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault()
+        const p = link.closest("p")
+        const originalText = p.dataset.fullText
+        const truncatedText = originalText.substring(0, limit)
+
+        p.innerHTML = `
+                    <span class="truncated-text">${truncatedText}</span>
+                    <span class="full-text" style="display: none;">${originalText}</span>
+                    <span class="read-more-container">
+                        <a href="#" class="read-more-link">... Ler mais</a>
+                    </span>
+                `
+        addReadMoreEvents()
+      })
+    })
+  }
+
+  addReadMoreEvents()
 })

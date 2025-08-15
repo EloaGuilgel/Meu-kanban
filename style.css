@@ -260,3 +260,25 @@ section.kanban h2 {
 .read-more-container:hover .read-more-link {
   color: #555; /* A cor do texto fica um pouco mais escura */
 }
+/* Container para o link "Ler menos" */
+.read-less-container {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+/* Estilo do link "Ler menos" */
+.read-less-link {
+  color: #888;
+  font-size: 1em;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+/* Efeito de hover no "Ler menos" */
+.read-less-link:hover {
+  color: #555;
+
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.05);
+}
