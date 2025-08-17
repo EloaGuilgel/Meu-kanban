@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       onEnd: (evt) => {
         evt.item.classList.remove("dragging")
-        saveState() // Salva o estado após cada drag-and-drop
+        saveStateToLocalStorage() // Salva o estado após cada drag-and-drop
       },
     })
   })
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const currentState = toggleAddCardFormButton.dataset.state
 
     if (currentState === "initial") {
-      // Se o estado é 'initial', mostramos o formulário
+      // Se o estado é 'initial', mostra o formulário
       addCardForm.classList.remove("hidden") // Remove a classe hidden para mostrar o formulário
       toggleAddCardFormButton.textContent = "Cancelar" // Muda o texto do botão para "Cancelar"
       toggleAddCardFormButton.dataset.state = "form-open" // Atualiza o estado do botão para 'form-open'
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
     todoCardsContainer.insertAdjacentElement("afterbegin", newCardElement)
 
     // Salva o estado atualizado no localStorage para persistir a nova card
-    saveState()
+    saveStateToLocalStorage()
 
     // Limpa os campos e esconde o formulário novamente após adicionar a card
     newCardTitleInput.value = ""
@@ -82,39 +82,71 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleAddCardFormButton.dataset.state = "initial" // Reseta o estado do botão principal
   })
 
+  // --- Lógica para Excluir Card (COM CONFIRMAÇÃO) ---
+  document.body.addEventListener("click", (event) => {
+    // Verifica se o clique foi em um botão de exclusão ou em um ícone dentro dele
+    const deleteButton = event.target.closest(".delete-card-btn")
+    if (deleteButton) {
+      const cardToDelete = deleteButton.closest(".card") // Encontra a card pai
+      if (cardToDelete) {
+        // PERGUNTA DE CONFIRMAÇÃO
+        if (window.confirm("Tem certeza que deseja excluir esta card?")) {
+          cardToDelete.remove()
+          saveStateToLocalStorage() // Salva o estado após a exclusão
+          console.log(`Card com ID ${cardToDelete.dataset.id} excluída.`)
+        } else {
+          console.log("Exclusão cancelada.")
+        }
+      }
+    }
+  })
+
   // Helper function para criar um elemento de card
   function createCardElement(id, title, description, tags = []) {
     const cardDiv = document.createElement("div")
     cardDiv.className = "card"
     cardDiv.dataset.id = id
 
-    // Use o texto completo da descrição e aplique a lógica de Ler Mais/Ler Menos
+    // Adiciona o título
+    const h3Element = document.createElement("h3")
+    h3Element.textContent = title
+    cardDiv.appendChild(h3Element)
+
+    // Adiciona o botão de exclusão
+    const deleteButton = document.createElement("button")
+    deleteButton.className = "delete-card-btn"
+    deleteButton.setAttribute("aria-label", "Excluir card")
+    deleteButton.innerHTML = '<ion-icon name="trash-outline"></ion-icon>'
+    cardDiv.appendChild(deleteButton)
+
+    // Adiciona a descrição (e aplica Ler Mais/Ler Menos)
     const pElement = document.createElement("p")
     pElement.textContent = description // Adiciona o texto puro para que initializeReadMoreOnParagraph possa truncar
+    cardDiv.appendChild(pElement) // Adiciona o parágrafo
 
-    cardDiv.innerHTML = `
-      <h3>${title}</h3>
-      <div class="tags">
-          ${tags.map((tag) => `<span>${tag}</span>`).join("")}
-      </div>
-    `
-    // Inserir o pElement antes das tags para manter a estrutura HTML
-    cardDiv.insertBefore(pElement, cardDiv.querySelector(".tags"))
+    // Adiciona as tags
+    const tagsDiv = document.createElement("div")
+    tagsDiv.className = "tags"
+    tags.forEach((tag) => {
+      const span = document.createElement("span")
+      span.textContent = tag
+      tagsDiv.appendChild(span)
+    })
+    cardDiv.appendChild(tagsDiv)
 
     // Inicializa Ler Mais/Ler Menos para o parágrafo da card recém-criada
     initializeReadMoreOnParagraph(pElement)
     return cardDiv
   }
 
-  function saveState() {
+  // Helper function para obter o estado atual do DOM (cards e suas colunas)
+  function getCurrentDomState() {
     const state = {}
     document.querySelectorAll(".kanban-column").forEach((col) => {
-      const key = col.dataset.columnId
-      // Ao salvar, agora salvamos o conteúdo completo de cada card
-      state[key] = [...col.querySelectorAll(".card")].map((c) => ({
+      const columnId = col.dataset.columnId
+      state[columnId] = [...col.querySelectorAll(".card")].map((c) => ({
         id: c.dataset.id,
         title: c.querySelector("h3")?.textContent || "",
-        // Captura o texto completo do dataset (se expandido) ou o textContent
         description:
           c.querySelector("p")?.dataset.fullText ||
           c.querySelector("p")?.textContent ||
@@ -122,59 +154,61 @@ document.addEventListener("DOMContentLoaded", function () {
         tags: [...c.querySelectorAll(".tags span")].map((s) => s.textContent),
       }))
     })
-    localStorage.setItem("kanban-state", JSON.stringify(state))
+    return state
   }
 
-  function loadState() {
-    const raw = localStorage.getItem("kanban-state")
-    let state = {}
+  // Função para salvar o estado atual do DOM no localStorage
+  function saveStateToLocalStorage() {
+    const stateToSave = getCurrentDomState()
+    localStorage.setItem("kanban-state", JSON.stringify(stateToSave))
+  }
 
-    // Tenta carregar o estado do localStorage
-    if (raw) {
+  // Função para carregar o estado e renderizar o Kanban Board
+  function loadAndRenderKanbanBoard() {
+    let loadedState = null
+    const rawStoredState = localStorage.getItem("kanban-state")
+
+    if (rawStoredState) {
       try {
-        state = JSON.parse(raw)
+        const parsedState = JSON.parse(rawStoredState)
+        // Verifica se o estado parseado é um objeto válido e não contém apenas colunas vazias
+        const hasContent = Object.values(parsedState).some(
+          (arr) => arr.length > 0
+        )
+        if (hasContent) {
+          loadedState = parsedState
+        }
       } catch (e) {
         console.error(
           "Erro ao parsear estado do localStorage, usando cards iniciais do HTML.",
           e
         )
-        state = {} // Em caso de erro, trate o localStorage como vazio
       }
     }
 
-    // Se o localStorage está vazio (ou houve erro de parse), preencha 'state' com as cards do HTML inicial
-    // e salve-o imediatamente. Isso garante que as cards padrão do HTML sejam persistidas.
-    if (
-      Object.keys(state).length === 0 ||
-      Object.values(state).every((arr) => arr.length === 0)
-    ) {
+    // Se não há estado válido no localStorage, captura o estado inicial do HTML
+    if (!loadedState) {
       console.log(
-        "Estado do localStorage vazio ou inválido. Capturando cards iniciais do HTML."
+        "LocalStorage vazio ou inválido. Capturando cards iniciais do HTML e salvando."
       )
-      document.querySelectorAll(".kanban-column").forEach((col) => {
-        const columnId = col.dataset.columnId
-        state[columnId] = [...col.querySelectorAll(".card")].map((c) => ({
-          id: c.dataset.id,
-          title: c.querySelector("h3")?.textContent || "",
-          description:
-            c.querySelector("p")?.dataset.fullText ||
-            c.querySelector("p")?.textContent ||
-            "",
-          tags: [...c.querySelectorAll(".tags span")].map((s) => s.textContent),
-        }))
-      })
-      // Salva este estado inicial capturado do HTML no localStorage
-      saveState()
+      const initialDomState = getCurrentDomState()
+      saveStateToLocalStorage() // Salva o estado inicial do HTML no localStorage
+      renderDomFromState(initialDomState) // Renderiza com base no estado do HTML
+    } else {
+      renderDomFromState(loadedState) // Renderiza com base no estado carregado do localStorage
     }
+  }
 
-    // Remove todas as cards existentes do DOM para reconstruir a partir do estado
+  // Função auxiliar para renderizar o DOM a partir de um objeto de estado
+  function renderDomFromState(state) {
+    // Limpa todas as cards existentes do DOM para evitar duplicatas e garantir a ordem
     document.querySelectorAll(".kanban-column .cards").forEach((container) => {
       while (container.firstChild) {
         container.removeChild(container.lastChild)
       }
     })
 
-    // Reconstrói o DOM com base no estado (seja do localStorage ou do HTML inicial)
+    // Reconstrói o DOM com base no estado fornecido
     Object.entries(state).forEach(([colKey, cardsData]) => {
       const list = document.querySelector(
         `.kanban-column[data-column-id="${colKey}"] .cards`
@@ -200,10 +234,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Função auxiliar para aplicar a lógica de "Ler Mais/Ler Menos" a um elemento <p> específico
   function initializeReadMoreOnParagraph(pElement) {
-    const originalText = pElement.innerText.trim()
+    const originalText = pElement.innerText.trim() // Obtém o texto original do parágrafo
     if (originalText.length > limit) {
-      pElement.dataset.fullText = originalText
-      const truncatedText = originalText.substring(0, limit)
+      // Verifica se o texto é maior que o limite
+      pElement.dataset.fullText = originalText // Armazena o texto completo no dataset do elemento
+      const truncatedText = originalText.substring(0, limit) // Trunca o texto
+      // Define o HTML do parágrafo com o texto truncado e o link "Ler mais"
       pElement.innerHTML = `
         <span class="truncated-text">${truncatedText}</span>
         <span class="full-text" style="display: none;">${originalText}</span>
@@ -216,21 +252,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Adiciona um único event listener ao corpo do documento para capturar cliques nos links "Ler Mais/Ler Menos"
   document.body.addEventListener("click", function (event) {
+    // Verifica se o clique foi em um link "Ler mais"
     if (event.target.classList.contains("read-more-link")) {
-      event.preventDefault()
-      const p = event.target.closest("p")
-      const fullText = p.dataset.fullText
+      event.preventDefault() // Previne o comportamento padrão do link (navegar para #)
+      const p = event.target.closest("p") // Encontra o elemento <p> pai do link clicado
+      const fullText = p.dataset.fullText // Obtém o texto completo salvo no dataset
+      // Atualiza o HTML do parágrafo para mostrar o texto completo e o link "Ler menos"
       p.innerHTML = `
         <span class="full-text">${fullText}</span>
         <span class="read-less-container">
           <a href="#" class="read-less-link">Ler menos</a>
         </span>
       `
-    } else if (event.target.classList.contains("read-less-link")) {
-      event.preventDefault()
-      const p = event.target.closest("p")
-      const originalText = p.dataset.fullText
-      const truncatedText = originalText.substring(0, limit)
+    }
+    // Verifica se o clique foi em um link "Ler menos"
+    else if (event.target.classList.contains("read-less-link")) {
+      event.preventDefault() // Previne o comportamento padrão do link
+      const p = event.target.closest("p") // Encontra o elemento <p> pai do link clicado
+      const originalText = p.dataset.fullText // Obtém o texto completo original salvo no dataset
+      const truncatedText = originalText.substring(0, limit) // Trunca o texto novamente
+      // Atualiza o HTML do parágrafo para mostrar o texto truncado e o link "Ler mais"
       p.innerHTML = `
         <span class="truncated-text">${truncatedText}</span>
         <span class="full-text" style="display: none;">${originalText}</span>
@@ -242,7 +283,5 @@ document.addEventListener("DOMContentLoaded", function () {
   })
 
   // Carrega o estado salvo do Kanban ao iniciar.
-  // Esta chamada agora é a principal para inicializar o board,
-  // garantindo que as cards HTML iniciais sejam salvas se não houver estado pré-existente.
-  loadState()
+  loadAndRenderKanbanBoard()
 })

@@ -10,7 +10,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kanban</title>
-    <!-- Link para o seu arquivo CSS -->
+    <!-- Link para arquivo CSS -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -91,12 +91,15 @@
               </div>
               <!-- Botão para INSERIR NOVA CARD (mostra o formulário) -->
               <button id="toggle-add-card-form" data-state="initial">
-                Inserir nova card
+                Inserir nova Card
               </button>
 
               <div class="cards">
                 <div class="card" data-id="1">
                   <h3>#Boracodar um Kanban ​👨🏻‍💻​</h3>
+                  <button class="delete-card-btn" aria-label="Excluir card">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
                   <p>
                     Novo desafio do #Boracodar da Rocketseat, onde é proposto
                     construir quadro de Kanban do zero.
@@ -108,6 +111,9 @@
                 </div>
                 <div class="card" data-id="2">
                   <h3>Manter a ofensiva🔥​​</h3>
+                  <button class="delete-card-btn" aria-label="Excluir card">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
                   <p>
                     Manter minha atividade na plataforma de estudos para não
                     perder a ofensiva.
@@ -124,6 +130,9 @@
               <div class="cards">
                 <div class="card" data-id="3">
                   <h3>Conferir o novo desafio 🚀​​</h3>
+                  <button class="delete-card-btn" aria-label="Excluir card">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
                   <p>
                     Conferir o novo projeto do #Boracodar para fazê-lo da melhor
                     forma possível.

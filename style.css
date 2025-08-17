@@ -1,4 +1,3 @@
-/* Seus estilos CSS originais */
 * {
   margin: 0;
   padding: 0;
@@ -149,7 +148,7 @@ section.filter {
   color: #7c7c8a;
 }
 
-/* --- Estilos para o Kanban e suas colunas (Desktop) --- */
+/* --- Estilos para o Kanban e colunas  --- */
 section.kanban {
   display: flex;
   gap: 4.8rem;
@@ -160,7 +159,6 @@ section.kanban {
   padding-bottom: 2rem;
 }
 
-/* Redefinindo o estilo das colunas */
 section.kanban > div {
   flex-basis: 30rem;
   flex-shrink: 0;
@@ -186,13 +184,14 @@ section.kanban h2 {
   min-height: 100px;
   box-sizing: border-box;
   cursor: grab;
-  /* Espaçamento entre os cards */
   margin-bottom: 2.4rem;
+  position: relative;
 }
 
 .card h3 {
   font-size: 1.4rem;
   color: #403937;
+  padding-right: 30px; /*  Cria espaço para o botão de exclusão */
 }
 
 .card p {
@@ -237,17 +236,16 @@ section.kanban h2 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   cursor: grabbing;
   opacity: 1 !important;
-  /* Removido: transform: rotate(2deg); para evitar que fique torto */
 }
 
 /* Estilo do espaço vazio que fica no lugar da carta original */
 .sortable-ghost {
-  opacity: 0 !important; /* CORRIGIDO: Agora o fantasma é completamente invisível */
-  background: none; /* CORRIGIDO: Remove o background */
-  border: none; /* CORRIGIDO: Remove a borda */
+  opacity: 0 !important;
+  background: none;
+  border: none;
 }
 
-/* Garante que o card arrastado fique visível e não "sumindo" */
+/* Garante que o card arrastado fique visível  */
 .sortable-drag {
   opacity: 1 !important;
 }
@@ -255,7 +253,7 @@ section.kanban h2 {
 /* Estilo do card quando ele é escolhido, para o momento antes de começar o arraste */
 .sortable-chosen {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: scale(1.03); /* Mantido para um efeito sutil de destaque */
+  transform: scale(1.03);
   cursor: grabbing;
 }
 
@@ -323,9 +321,9 @@ section.kanban h2 {
 
 .add-card-form input[type="text"]::placeholder,
 .add-card-form textarea::placeholder {
-  color: #7c7c8a; /* Cor do texto de placeholder */
-  font-family: "Inter", sans-serif; /* Garante a fonte explicitamente */
-  font-weight: 500; /* Garante o peso da fonte consistente */
+  color: #7c7c8a;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
 }
 
 .add-card-form input[type="text"]:focus,
@@ -349,36 +347,64 @@ section.kanban h2 {
   background-color: #6a30d0;
 }
 
-/* Nova regra para esconder elementos */
+/*  regra para esconder elementos */
 .hidden {
-  display: none !important; /* Garante que o elemento fique oculto */
+  display: none !important;
 }
 
-/* ---  ESTILOS PARA O BOTÃO "Inserir nova card" / "Cancelar" --- */
+/* --- ESTILOS PARA O BOTÃO "Inserir nova card" / "Cancelar" --- */
 #toggle-add-card-form {
-  width: 50%; /* Ocupa a largura total da coluna */
-  padding: 1rem 1.6rem; /* Padding interno */
-  margin-bottom: 2.4rem; /* Espaçamento abaixo do botão */
+  width: 50%;
+  padding: 1rem 1.6rem;
+  margin-bottom: 2.4rem;
   background-color: #7c3aed;
-  color: white; /* texto */
-  border: 1px solid #7c3aed; /* Borda roxa escura */
-  border-radius: 0.5rem; /* Cantos arredondados */
-  font-size: 1.4rem; /* Tamanho da fonte */
-  font-weight: 600; /* Peso da fonte */
-  cursor: pointer; /* Cursor de mão */
+  color: white;
+  border: 1px solid #7c3aed;
+  border-radius: 0.5rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease,
-    border-color 0.2s ease; /* Transições suaves */
+    border-color 0.2s ease;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
-/* Estilo específico para o estado "Cancelar" do botão */
 #toggle-add-card-form[data-state="form-open"] {
-  background-color: #7c3aed; /* Fundo roxo */
-  color: white; /* Texto brancp */
-  border: 1px solid #7c3aed; /* Borda roxa */
+  background-color: #7c3aed;
+  color: white;
+  border: 1px solid #7c3aed;
+}
+
+#toggle-add-card-form[data-state="form-open"]:hover {
+  background-color: #6a30d0;
+  color: white;
+  border-color: #6a30d0;
+}
+
+/* ---  ESTILOS PARA O BOTÃO DE EXCLUIR CARD --- */
+.delete-card-btn {
+  position: absolute; /* Posiciona o botão em relação à card */
+  top: 10px; /* Distância do topo */
+  right: 10px; /* Distância da direita */
+  background: none; /* Sem fundo */
+  border: none; /* Sem borda */
+  color: #999; /* Cor do ícone */
+  font-size: 1.8rem; /* Tamanho do ícone */
+  cursor: pointer; /* Cursor de mão */
+  opacity: 0.7; /* Levemente transparente por padrão */
+  transition: opacity 0.2s ease, color 0.2s ease; /* Transição suave */
+  padding: 5px; /* Adicionado padding para facilitar o clique */
+  line-height: 1; /* Alinha o ícone */
+}
+
+.delete-card-btn:hover {
+  opacity: 1; /* Fica totalmente visível no hover */
+  color: #ff4d4d; /* Cor vermelha no hover para indicar exclusão */
 }
 
 /* --- Media Queries para Responsividade --- */
-/* Telas de laptops e tablets (até 1024px) */
 @media (max-width: 1024px) {
   main .inner {
     padding: 4.8rem 2rem;
@@ -389,7 +415,6 @@ section.kanban h2 {
   }
 }
 
-/* Telas de tablets e celulares (até 768px) */
 @media (max-width: 768px) {
   #app {
     grid-template-columns: 1fr;
@@ -453,6 +478,9 @@ section.kanban h2 {
     width: 100%;
     justify-content: center;
   }
+  #toggle-add-card-form {
+    width: 100%;
+  }
 }
 
 /* Impede a seleção de texto durante o arraste */
@@ -475,8 +503,8 @@ main {
 .cards:empty {
   min-height: 12rem;
   background-color: #f9f9f9;
-  border: 2px #d1d1d1;
-  border-radius: none;
+  border: 2px dashed #d1d1d1;
+  border-radius: 8px;
 }
 /* quando o card estiver sendo arrastado */
 .dragging {
