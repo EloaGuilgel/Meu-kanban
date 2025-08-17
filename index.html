@@ -16,7 +16,6 @@
   <body>
     <div id="app">
       <nav>
-        <!-- As imagens abaixo são placeholders. Você precisará substituí-las pelos seus assets reais. -->
         <img src="./assets/logo.svg" alt="logo do site" class="logo" />
         <ul>
           <li>
@@ -50,10 +49,10 @@
           <section class="title-avatar">
             <h1>
               Meu Kanban
-              <!-- Placeholder para o ícone de lápis -->
+
               <img src="./assets/pencil.svg" alt="Lápis" />
             </h1>
-            <!-- Avatar do GitHub do usuário como exemplo -->
+
             <img src="https://github.com/eloaguilgel.png" alt="avatar" />
           </section>
           <section class="filter">
@@ -73,6 +72,28 @@
             <!-- Adicionando data-column-id para o JavaScript e a classe kanban-column -->
             <div class="todo kanban-column" data-column-id="todo">
               <h2>A fazer</h2>
+              <!-- Formulário para adicionar nova card - INICIALMENTE ESCONDIDO -->
+              <div class="add-card-form hidden">
+                <input
+                  type="text"
+                  id="new-card-title"
+                  placeholder="Título do card"
+                  required
+                />
+                <textarea
+                  id="new-card-description"
+                  placeholder="Descrição do card"
+                ></textarea>
+                <button id="add-new-card-button-form-submit">
+                  Adicionar Card
+                </button>
+                <!-- Novo ID para o botão de submissão do formulário -->
+              </div>
+              <!-- Botão para INSERIR NOVA CARD (mostra o formulário) -->
+              <button id="toggle-add-card-form" data-state="initial">
+                Inserir nova card
+              </button>
+
               <div class="cards">
                 <div class="card" data-id="1">
                   <h3>#Boracodar um Kanban ​👨🏻‍💻​</h3>
@@ -119,7 +140,7 @@
               <h2>Feito</h2>
               <div class="cards">
                 <div class="card" data-id="4">
-                  <h3>#Boracodar uma página de login ​👨🏻🏻‍💻​</h3>
+                  <h3>#Boracodar uma página de login ​👨🏻‍💻​</h3>
                   <p>
                     Novo desafio do #Boracodar da Rocketseat, onde é proposto
                     construir uma página de login.
@@ -146,7 +167,7 @@
       src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-    <!-- Link para o seu arquivo JavaScript -->
+    <!-- Link para o  arquivo JavaScript -->
     <script src="script.js"></script>
   </body>
 </html>
