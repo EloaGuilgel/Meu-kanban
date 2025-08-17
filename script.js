@@ -1,157 +1,120 @@
-document.querySelectorAll(".cards").forEach((list) => {
-  new Sortable(list, {
-    group: "kanban",
-    animation: 150,
-    ghostClass: "dragging",
-    chosenClass: "chosen",
-    emptyInsertThreshold: 10,
-    handle: ".card",
-    onEnd: saveState,
-  })
-})
-
-function saveState() {
-  const state = {}
-  document.querySelectorAll(".todo, .doing, .done").forEach((col) => {
-    const key = col.classList[0]
-    const ids = [...col.querySelectorAll(".card")].map((c) => c.dataset.id)
-    state[key] = ids
-  })
-  localStorage.setItem("kanban-state", JSON.stringify(state))
-}
-
-function loadState() {
-  const raw = localStorage.getItem("kanban-state")
-  if (!raw) return
-  const state = JSON.parse(raw)
-  Object.entries(state).forEach(([colKey, ids]) => {
-    const list = document.querySelector(`.${colKey} .cards`)
-    ids.forEach((id) => {
-      const card = document.querySelector(`.card[data-id="${id}"]`)
-      if (card) list.appendChild(card)
-    })
-  })
-}
-/**
- * Trunca o texto de parágrafos que excedem um limite de caracteres,
- * adicionando a opção de "Ler mais" para exibir o conteúdo completo.
- */
 document.addEventListener("DOMContentLoaded", function () {
-  const elements = document.querySelectorAll(".cards p")
-  const limit = 60
+  // --- Lógica do Drag-and-Drop com SortableJS ---
+  const containers = document.querySelectorAll(".cards")
 
-  // --- Parte 1: Lógica de Truncamento Inicial e Criação da Estrutura ---
-  for (let p of elements) {
-    const originalText = p.innerText.trim()
+  containers.forEach((list) => {
+    new Sortable(list, {
+      group: "kanban",
+      animation: 150,
 
-    if (originalText.length > limit) {
-      // Armazena o texto original em um atributo de dado
-      p.dataset.fullText = originalText
+      // As classes CSS já são definidas no CSS, não há necessidade de duplicar aqui
+      // chosenClass: "sortable-chosen",
+      // dragClass: "sortable-drag",
+      // ghostClass: "sortable-ghost",
 
-      // Cria a versão truncada do texto
-      const truncatedText = originalText.substring(0, limit)
+      forceFallback: false,
 
-      // Insere a estrutura inicial com o texto truncado e o link "Ler mais"
-      p.innerHTML = `
-                <span class="truncated-text">${truncatedText}</span>
-                <span class="full-text" style="display: none;">${originalText}</span>
-                <span class="read-more-container">
-                    <a href="#" class="read-more-link">... Ler mais</a>
-                </span>
-            `
-    }
-  }
+      onStart: (evt) => {
+        // Adiciona a classe 'dragging' para controlar o estilo do card sendo arrastado
+        evt.item.classList.add("dragging")
+      },
 
-  // --- Parte 2: Lógica de Alternância de Conteúdo (esconder/exibir) ---
-  // Adiciona o evento de clique a todos os links "Ler mais"
-  const readMoreLinks = document.querySelectorAll(".read-more-link")
-
-  readMoreLinks.forEach((link) => {
-    link.addEventListener("click", (event) => {
-      event.preventDefault()
-
-      const p = link.closest("p")
-      if (!p) return
-
-      const fullText = p.dataset.fullText
-
-      // Substitui o conteúdo do parágrafo pelo texto completo + link "Ler menos"
-      p.innerHTML = `
-                <span class="full-text">${fullText}</span>
-                <span class="read-less-container">
-                    <a href="#" class="read-less-link">Ler menos</a>
-                </span>
-            `
-
-      // Encontra o novo link "Ler menos" e adiciona o evento de clique a ele
-      const readLessLink = p.querySelector(".read-less-link")
-      readLessLink.addEventListener("click", (e) => {
-        e.preventDefault()
-
-        // Retorna ao estado original (truncado)
-        const originalText = p.dataset.fullText
-        const truncatedText = originalText.substring(0, limit)
-
-        p.innerHTML = `
-                    <span class="truncated-text">${truncatedText}</span>
-                    <span class="full-text" style="display: none;">${originalText}</span>
-                    <span class="read-more-container">
-                        <a href="#" class="read-more-link">... Ler mais</a>
-                    </span>
-                `
-        // Recarrega a página para re-ativar os eventos (não é o ideal, mas funciona)
-        // location.reload();
-
-        // Melhor abordagem: uma função que re-adiciona os eventos
-        addReadMoreEvents()
-      })
+      onEnd: (evt) => {
+        // Remove a classe 'dragging' quando o arraste termina
+        evt.item.classList.remove("dragging")
+        // Salva o estado do Kanban no Local Storage
+        saveState()
+      },
     })
   })
 
-  // Função para re-adicionar eventos de clique, caso o DOM seja modificado
-  function addReadMoreEvents() {
-    const newReadMoreLinks = document.querySelectorAll(".read-more-link")
-    newReadMoreLinks.forEach((link) => {
-      link.addEventListener("click", (event) => {
-        event.preventDefault()
+  function saveState() {
+    const state = {}
+    // Busca todas as colunas do kanban, usando a classe genérica 'kanban-column'
+    document.querySelectorAll(".kanban-column").forEach((col) => {
+      const key = col.dataset.columnId // Usa o atributo data-column-id como chave
+      const ids = [...col.querySelectorAll(".card")].map((c) => c.dataset.id)
+      state[key] = ids
+    })
+    localStorage.setItem("kanban-state", JSON.stringify(state))
+  }
 
-        const p = link.closest("p")
-        if (!p) return
-
-        const fullText = p.dataset.fullText
-
-        p.innerHTML = `
-                    <span class="full-text">${fullText}</span>
-                    <span class="read-less-container">
-                        <a href="#" class="read-less-link">Ler menos</a>
-                    </span>
-                `
-        addReadLessEvents()
-      })
+  function loadState() {
+    const raw = localStorage.getItem("kanban-state")
+    if (!raw) return // Se não houver estado salvo, não faz nada
+    const state = JSON.parse(raw)
+    // Itera sobre as chaves e IDs salvos no estado
+    Object.entries(state).forEach(([colKey, ids]) => {
+      // Encontra a lista (cards) dentro da coluna usando o data-column-id
+      const list = document.querySelector(
+        `.kanban-column[data-column-id="${colKey}"] .cards`
+      )
+      if (list) {
+        // Verifica se a lista existe antes de manipular
+        ids.forEach((id) => {
+          const card = document.querySelector(`.card[data-id="${id}"]`)
+          if (card) {
+            // Verifica se o card existe antes de adicionar
+            list.appendChild(card) // Adiciona o card à sua posição salva
+          }
+        })
+      }
     })
   }
 
-  // Função para adicionar os eventos de clique para o "Ler menos"
-  function addReadLessEvents() {
-    const readLessLinks = document.querySelectorAll(".read-less-link")
-    readLessLinks.forEach((link) => {
-      link.addEventListener("click", (e) => {
-        e.preventDefault()
-        const p = link.closest("p")
-        const originalText = p.dataset.fullText
-        const truncatedText = originalText.substring(0, limit)
+  // --- Lógica do "Ler Mais/Ler Menos" com delegação de eventos ---
+  const limit = 60 // Limite de caracteres para truncar o texto
 
-        p.innerHTML = `
-                    <span class="truncated-text">${truncatedText}</span>
-                    <span class="full-text" style="display: none;">${originalText}</span>
-                    <span class="read-more-container">
-                        <a href="#" class="read-more-link">... Ler mais</a>
-                    </span>
-                `
-        addReadMoreEvents()
-      })
-    })
-  }
+  // Adiciona um único event listener ao corpo do documento para capturar cliques nos links
+  document.body.addEventListener("click", function (event) {
+    // Verifica se o clique foi em um link "Ler mais"
+    if (event.target.classList.contains("read-more-link")) {
+      event.preventDefault() // Previne o comportamento padrão do link
+      const p = event.target.closest("p") // Encontra o elemento <p> pai
+      const fullText = p.dataset.fullText // Obtém o texto completo do dataset
+      // Atualiza o HTML do parágrafo para mostrar o texto completo e o link "Ler menos"
+      p.innerHTML = `
+        <span class="full-text">${fullText}</span>
+        <span class="read-less-container">
+          <a href="#" class="read-less-link">Ler menos</a>
+        </span>
+      `
+    }
+    // Verifica se o clique foi em um link "Ler menos"
+    else if (event.target.classList.contains("read-less-link")) {
+      event.preventDefault() // Previne o comportamento padrão do link
+      const p = event.target.closest("p") // Encontra o elemento <p> pai
+      const originalText = p.dataset.fullText // Obtém o texto completo original
+      const truncatedText = originalText.substring(0, limit) // Trunca o texto novamente
+      // Atualiza o HTML do parágrafo para mostrar o texto truncado e o link "Ler mais"
+      p.innerHTML = `
+        <span class="truncated-text">${truncatedText}</span>
+        <span class="full-text" style="display: none;">${originalText}</span>
+        <span class="read-more-container">
+          <a href="#" class="read-more-link">... Ler mais</a>
+        </span>
+      `
+    }
+  })
 
-  addReadMoreEvents()
+  // Inicializa o texto para todos os parágrafos de cards existentes ao carregar a página
+  const elements = document.querySelectorAll(".cards p")
+  elements.forEach((p) => {
+    const originalText = p.innerText.trim()
+    if (originalText.length > limit) {
+      p.dataset.fullText = originalText // Armazena o texto completo no dataset
+      const truncatedText = originalText.substring(0, limit) // Trunca o texto
+      // Define o HTML inicial com o texto truncado e o link "Ler mais"
+      p.innerHTML = `
+        <span class="truncated-text">${truncatedText}</span>
+        <span class="full-text" style="display: none;">${originalText}</span>
+        <span class="read-more-container">
+          <a href="#" class="read-more-link">... Ler mais</a>
+        </span>
+      `
+    }
+  })
+
+  // Carrega o estado salvo do Kanban após a inicialização de todos os elementos
+  loadState()
 })

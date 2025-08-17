@@ -10,11 +10,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kanban</title>
+    <!-- Link para o seu arquivo CSS -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div id="app">
       <nav>
+        <!-- As imagens abaixo são placeholders. Você precisará substituí-las pelos seus assets reais. -->
         <img src="./assets/logo.svg" alt="logo do site" class="logo" />
         <ul>
           <li>
@@ -46,7 +48,12 @@
       <main>
         <div class="inner">
           <section class="title-avatar">
-            <h1>Meu Kanban <img src="./assets/pencil.svg" alt="" /></h1>
+            <h1>
+              Meu Kanban
+              <!-- Placeholder para o ícone de lápis -->
+              <img src="./assets/pencil.svg" alt="Lápis" />
+            </h1>
+            <!-- Avatar do GitHub do usuário como exemplo -->
             <img src="https://github.com/eloaguilgel.png" alt="avatar" />
           </section>
           <section class="filter">
@@ -62,39 +69,36 @@
               />
             </div>
           </section>
-          <!-- Kanban Section -->
           <section class="kanban">
-            <div class="todo">
+            <!-- Adicionando data-column-id para o JavaScript e a classe kanban-column -->
+            <div class="todo kanban-column" data-column-id="todo">
               <h2>A fazer</h2>
-              <!-- primeiro cartão  -->
               <div class="cards">
                 <div class="card" data-id="1">
-                  <h3>#Boracodar um Kaban ​👨🏻‍💻​</h3>
+                  <h3>#Boracodar um Kanban ​👨🏻‍💻​</h3>
                   <p>
                     Novo desafio do #Boracodar da Rocketseat, onde é proposto
-                    construir quadro de Kaban do zero.
+                    construir quadro de Kanban do zero.
                   </p>
-
                   <div class="tags">
                     <span>Rocketseat</span>
                     <span>Desafio</span>
                   </div>
                 </div>
-                <!-- segundo cartão  -->
                 <div class="card" data-id="2">
                   <h3>Manter a ofensiva🔥​​</h3>
                   <p>
                     Manter minha atividade na plataforma de estudos para não
                     perder a ofensiva.
                   </p>
-
                   <div class="tags">
                     <span>Rocketseat</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="doing">
+            <!-- Adicionando data-column-id para o JavaScript e a classe kanban-column -->
+            <div class="doing kanban-column" data-column-id="doing">
               <h2>Fazendo</h2>
               <div class="cards">
                 <div class="card" data-id="3">
@@ -103,7 +107,6 @@
                     Conferir o novo projeto do #Boracodar para fazê-lo da melhor
                     forma possível.
                   </p>
-
                   <div class="tags">
                     <span>Rocketseat</span>
                     <span>Desafio</span>
@@ -111,16 +114,16 @@
                 </div>
               </div>
             </div>
-            <div class="done">
+            <!-- Adicionando data-column-id para o JavaScript e a classe kanban-column -->
+            <div class="done kanban-column" data-column-id="done">
               <h2>Feito</h2>
               <div class="cards">
                 <div class="card" data-id="4">
-                  <h3>#Boracodar uma página de login ​👨🏻‍💻​</h3>
+                  <h3>#Boracodar uma página de login ​👨🏻🏻‍💻​</h3>
                   <p>
                     Novo desafio do #Boracodar da Rocketseat, onde é proposto
                     construir uma página de login.
                   </p>
-
                   <div class="tags">
                     <span>Rocketseat</span>
                     <span>Desafio</span>
@@ -133,6 +136,7 @@
       </main>
     </div>
 
+    <!-- Scripts de bibliotecas -->
     <script
       type="module"
       src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
@@ -141,8 +145,8 @@
       nomodule
       src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
     ></script>
-    <!--Adicionar a biblioteca SortableJS-->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+    <!-- Link para o seu arquivo JavaScript -->
     <script src="script.js"></script>
   </body>
 </html>

@@ -1,3 +1,4 @@
+/* Seus estilos CSS originais */
 * {
   margin: 0;
   padding: 0;
@@ -8,13 +9,14 @@
 
 :root {
   font-size: 62.5%;
-  font-family: "inter", sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 body {
   font-size: 1.6rem;
   background-color: #7c3aed;
 }
+
 a {
   text-decoration: none;
 }
@@ -68,7 +70,6 @@ a ion-icon {
 
 section.title-avatar {
   display: flex;
-
   justify-content: space-between;
   align-items: center;
   padding: 1.1rem 2.4rem;
@@ -148,21 +149,32 @@ section.filter {
   color: #7c7c8a;
 }
 
+/* --- Estilos para o Kanban e suas colunas (Desktop) --- */
 section.kanban {
   display: flex;
   gap: 4.8rem;
   padding-top: 3.2rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2rem;
 }
 
-section.kanban > * {
-  flex: 1;
+/* Redefinindo o estilo das colunas */
+section.kanban > div {
+  flex-basis: 30rem;
+  flex-shrink: 0;
+  flex-grow: 1;
   padding: 2.4rem;
+  background-color: #f4f5f7;
+  border-radius: 8px;
+  min-height: 20rem;
 }
 
 section.kanban h2 {
   font-size: 2rem;
   color: #403937;
-  padding: 2.4rem 0;
+  padding: 0 0 2.4rem;
 }
 
 .card {
@@ -171,7 +183,13 @@ section.kanban h2 {
   box-shadow: 0rem 0.4rem 1.6rem #eae2fd;
   border-radius: 0.8rem;
   line-height: 130%;
+  min-height: 100px;
+  box-sizing: border-box;
+  cursor: grab;
+  /* Espaçamento entre os cards */
+  margin-bottom: 2.4rem;
 }
+
 .card h3 {
   font-size: 1.4rem;
   color: #403937;
@@ -204,69 +222,59 @@ section.kanban h2 {
 .cards {
   display: flex;
   flex-direction: column;
-  gap: 2.4rem;
-}
-.card {
-  min-height: 100px;
-  box-sizing: border-box; /* garante que padding conta no tamanho */
 }
 
-.chosen {
-  opacity: 0.9;
-  background: white;
+/* Garante que o último card da lista não tenha margem inferior */
+.cards .card:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Estilos para o Drag-and-Drop (CORRIGIDO) --- */
+
+/* Estilo para a carta sendo arrastada (o clone) */
+.sortable-drag-fallback {
+  background: #fff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: grabbing;
+  opacity: 1 !important;
+  /* Removido: transform: rotate(2deg); para evitar que fique torto */
 }
 
-.dragging {
-  opacity: 0.6;
-  background: white;
-  box-sizing: border-box;
-  width: 100%; /* mantém largura */
+/* Estilo do espaço vazio que fica no lugar da carta original */
+.sortable-ghost {
+  opacity: 0.2; /* Visível, só mais claro para um fantasma sutil */
+  background: #eae2fd; /* cor de destaque */
+  border-radius: 0.8rem; /* Use a mesma borda do card normal para manter consistência */
+  border: 2px dashed #a0a0a0; /* Borda pontilhada para efeito de recorte */
+  /* Removido: transform: rotate(2deg); para evitar que fique torto */
 }
-/* Container que envolve o link "Ler mais" para controle de espaçamento */
+
+/* Garante que o card arrastado fique visível e não "sumindo" */
+.sortable-drag {
+  opacity: 1 !important;
+}
+
+/* Estilo do card quando ele é escolhido, para o momento antes de começar o arraste */
+.sortable-chosen {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.03); /* Mantido para um efeito sutil de destaque */
+  cursor: grabbing;
+}
+
+/* --- Estilos para "Ler mais" e "Ler menos" --- */
 .read-more-container {
-  display: inline-block; /* Altera para inline-block para que a sombra funcione corretamente */
-  margin-left: 5px; /* Adiciona um pequeno espaço à esquerda */
-  transition: box-shadow 0.2s ease, background-color 0.2s ease; /* Transição para a sombra e a cor de fundo */
-  border-radius: 4px; /* Para que a sombra e o fundo tenham cantos arredondados */
-}
-
-/* Estilo para o link "Ler mais" */
-.read-more-link {
-  color: #888; /* Cor cinza, mais fosca que o texto normal */
-  font-size: 1em;
-  text-decoration: none;
-  cursor: pointer;
-  padding: 2px 4px; /* Adiciona um pequeno padding para que a sombra não fique grudada no texto */
-}
-
-/* Efeito de hover: ao passar o mouse sobre o container */
-.read-more-container:hover {
-  /* Sombra sutil:
-       0 - deslocamento horizontal
-       0 - deslocamento vertical
-       8px - raio do desfoque
-       rgba(0, 0, 0, 0.1) - cor preta com 10% de opacidade (muito leve) */
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.05
-  ); /* Um leve fundo cinza para realçar a sombra */
-}
-
-/* Efeito de hover no link dentro do container */
-.read-more-container:hover .read-more-link {
-  color: #555; /* A cor do texto fica um pouco mais escura */
-}
-/* Container para o link "Ler menos" */
-.read-less-container {
   display: inline-block;
   margin-left: 5px;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+  border-radius: 4px;
 }
 
-/* Estilo do link "Ler menos" */
+.read-more-container:hover {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.read-more-link,
 .read-less-link {
   color: #888;
   font-size: 1em;
@@ -275,10 +283,125 @@ section.kanban h2 {
   padding: 2px 4px;
 }
 
-/* Efeito de hover no "Ler menos" */
+.read-more-link:hover,
 .read-less-link:hover {
   color: #555;
+}
 
+.read-less-link:hover {
+  text-decoration: none;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+.read-less-container {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+/* --- Media Queries para Responsividade --- */
+/* Telas de laptops e tablets (até 1024px) */
+@media (max-width: 1024px) {
+  main .inner {
+    padding: 4.8rem 2rem;
+  }
+
+  section.kanban {
+    gap: 2rem;
+  }
+}
+
+/* Telas de tablets e celulares (até 768px) */
+@media (max-width: 768px) {
+  #app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  nav {
+    padding: 1.6rem 2rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f2f5;
+    border-bottom: 0.1rem solid #e3e3e3;
+  }
+
+  nav .logo,
+  nav ul {
+    display: none;
+  }
+
+  main {
+    padding-top: 2rem;
+    overflow-y: auto;
+  }
+
+  .inner {
+    padding: 0 2rem;
+  }
+
+  section.kanban {
+    flex-direction: column;
+    gap: 2rem;
+    padding-bottom: 2rem;
+    overflow-x: hidden;
+  }
+
+  section.kanban > div {
+    flex-basis: auto;
+    flex-shrink: 1;
+    width: 100%;
+    min-width: auto;
+  }
+
+  .title-avatar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.6rem;
+  }
+
+  .filter {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .input-wrapper {
+    width: 100%;
+  }
+
+  .filter button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Impede a seleção de texto durante o arraste */
+.card {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Opcional: para garantir que nada seja selecionado na tela principal */
+main {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Feedback visual para colunas vazias */
+.cards:empty {
+  min-height: 12rem;
+  background-color: #f9f9f9;
+  border: 2px dashed #d1d1d1;
+  border-radius: 8px;
+}
+/* quando o card estiver sendo arrastado */
+.dragging {
+  opacity: 1 !important; /* Agora o card original fica 100% visível ao arrastar */
+  /* Removido: transform: rotate(2deg); para evitar que fique torto */
 }
