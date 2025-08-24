@@ -1,4 +1,67 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // --- CÓDIGO DO FILTRO ---
+  const filterButton = document.querySelector(".filter > button")
+  const filterMenu = document.getElementById("filter-menu")
+  const filterCheckboxes = document.querySelectorAll(
+    '.filter-option input[type="checkbox"]'
+  )
+  const allFilterButton = document.querySelector(".filter-menu .all-filter")
+  const kanbanColumns = document.querySelectorAll(".kanban-column")
+
+  // Função para aplicar o filtro
+  function applyFilter() {
+    const activeFilters = new Set()
+    filterCheckboxes.forEach((checkbox) => {
+      if (checkbox.checked) {
+        activeFilters.add(checkbox.dataset.filterBy)
+      }
+    })
+
+    kanbanColumns.forEach((column) => {
+      if (
+        activeFilters.size === 0 ||
+        activeFilters.has(column.dataset.columnId)
+      ) {
+        column.style.display = "block" // ou 'flex', dependendo do seu layout principal
+      } else {
+        column.style.display = "none"
+      }
+    })
+  }
+
+  // Event listener para abrir/fechar o menu
+  filterButton.addEventListener("click", (event) => {
+    event.stopPropagation()
+    filterMenu.classList.toggle("hidden")
+  })
+
+  // Fecha o menu se clicar fora dele
+  document.addEventListener("click", (event) => {
+    if (
+      !filterMenu.contains(event.target) &&
+      !filterButton.contains(event.target)
+    ) {
+      filterMenu.classList.add("hidden")
+    }
+  })
+
+  // Event listener para cada checkbox
+  filterCheckboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", applyFilter)
+  })
+
+  // Event listener para o botão "Limpar filtro"
+  allFilterButton.addEventListener("click", () => {
+    filterCheckboxes.forEach((checkbox) => {
+      checkbox.checked = true
+    })
+    applyFilter()
+  })
+
+  // Aplica o filtro inicial ao carregar a página
+  applyFilter()
+  // --- FIM DO CÓDIGO DO FILTRO ---
+
   // --- Lógica do Drag-and-Drop com SortableJS ---
   const containers = document.querySelectorAll(".cards")
 

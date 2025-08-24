@@ -92,6 +92,7 @@ section.filter {
   padding: 0 2.4rem;
   display: flex;
   gap: 1.2rem;
+  position: relative;
 }
 
 .filter button {
@@ -148,7 +149,7 @@ section.filter {
   color: #7c7c8a;
 }
 
-/* --- Estilos para o Kanban e colunas  --- */
+/* --- Estilos para o Kanban e colunas --- */
 section.kanban {
   display: flex;
   gap: 4.8rem;
@@ -191,7 +192,7 @@ section.kanban h2 {
 .card h3 {
   font-size: 1.4rem;
   color: #403937;
-  padding-right: 30px; /*  Cria espaço para o botão de exclusão */
+  padding-right: 30px;
 }
 
 .card p {
@@ -223,14 +224,12 @@ section.kanban h2 {
   flex-direction: column;
 }
 
-/* Garante que o último card da lista não tenha margem inferior */
 .cards .card:last-child {
   margin-bottom: 0;
 }
 
 /* --- Estilos para o Drag-and-Drop --- */
 
-/* Estilo para a carta sendo arrastada (o clone) */
 .sortable-drag-fallback {
   background: #fff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -238,19 +237,16 @@ section.kanban h2 {
   opacity: 1 !important;
 }
 
-/* Estilo do espaço vazio que fica no lugar da carta original */
 .sortable-ghost {
   opacity: 0 !important;
   background: none;
   border: none;
 }
 
-/* Garante que o card arrastado fique visível  */
 .sortable-drag {
   opacity: 1 !important;
 }
 
-/* Estilo do card quando ele é escolhido, para o momento antes de começar o arraste */
 .sortable-chosen {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: scale(1.03);
@@ -347,11 +343,6 @@ section.kanban h2 {
   background-color: #6a30d0;
 }
 
-/*  regra para esconder elementos */
-.hidden {
-  display: none !important;
-}
-
 /* --- ESTILOS PARA O BOTÃO "Inserir nova card" / "Cancelar" --- */
 #toggle-add-card-form {
   width: 50%;
@@ -383,25 +374,25 @@ section.kanban h2 {
   border-color: #6a30d0;
 }
 
-/* ---  ESTILOS PARA O BOTÃO DE EXCLUIR CARD --- */
+/* --- ESTILOS PARA O BOTÃO DE EXCLUIR CARD --- */
 .delete-card-btn {
-  position: absolute; /* Posiciona o botão em relação à card */
-  top: 10px; /* Distância do topo */
-  right: 10px; /* Distância da direita */
-  background: none; /* Sem fundo */
-  border: none; /* Sem borda */
-  color: #999; /* Cor do ícone */
-  font-size: 1.8rem; /* Tamanho do ícone */
-  cursor: pointer; /* Cursor de mão */
-  opacity: 0.7; /* Levemente transparente por padrão */
-  transition: opacity 0.2s ease, color 0.2s ease; /* Transição suave */
-  padding: 5px; /* Adicionado padding para facilitar o clique */
-  line-height: 1; /* Alinha o ícone */
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 1.8rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, color 0.2s ease;
+  padding: 5px;
+  line-height: 1;
 }
 
 .delete-card-btn:hover {
-  opacity: 1; /* Fica totalmente visível no hover */
-  color: #ff4d4d; /* Cor vermelha no hover para indicar exclusão */
+  opacity: 1;
+  color: #ff4d4d;
 }
 
 /* --- Media Queries para Responsividade --- */
@@ -478,12 +469,52 @@ section.kanban h2 {
     width: 100%;
     justify-content: center;
   }
+
   #toggle-add-card-form {
     width: 100%;
   }
 }
 
-/* Impede a seleção de texto durante o arraste */
+/* --- Estilos para o menu de filtro --- */
+.filter-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 1rem;
+  background: #fff;
+  border: 1px solid #e3e3e3;
+  border-radius: 0.8rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  z-index: 1000;
+  flex-direction: column;
+  gap: 1.2rem;
+  min-width: 15rem;
+  font-size: 1.4rem;
+}
+
+.filter-menu button {
+  background: none;
+  border: none;
+  color: #505059;
+  padding: 0.8rem 1.2rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.filter-menu button:hover {
+  background-color: #f4f5f7;
+  color: #403937;
+}
+
+.kanban-column.hidden-column {
+  display: none !important;
+}
+
 .card {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -491,7 +522,6 @@ section.kanban h2 {
   user-select: none;
 }
 
-/* Opcional: para garantir que nada seja selecionado na tela principal */
 main {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -499,14 +529,90 @@ main {
   user-select: none;
 }
 
-/* Feedback visual para colunas vazias */
 .cards:empty {
   min-height: 12rem;
   background-color: #f9f9f9;
   border: 2px dashed #d1d1d1;
   border-radius: 8px;
 }
-/* quando o card estiver sendo arrastado */
+
 .dragging {
   opacity: 1 !important;
+}
+
+.filter-menu .all-filter {
+  background: none;
+  border: none;
+  color: #7c3aed;
+  padding: 0.8rem 1.2rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+  font-weight: 500;
+}
+
+.filter-menu .all-filter:hover {
+  background-color: #f4f5f7;
+  color: #6a30d0;
+}
+
+/* --- Estilos para os switches do filtro --- */
+.filter-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1.2rem;
+}
+
+.filter-option label {
+  color: #505059;
+  cursor: pointer;
+}
+
+.filter-option input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.filter-option .slider {
+  position: relative;
+  cursor: pointer;
+  width: 40px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 20px;
+  transition: 0.4s;
+}
+
+.filter-option .slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.filter-option input:checked + .slider {
+  background-color: #7c3aed;
+}
+
+.filter-option input:focus + .slider {
+  box-shadow: 0 0 1px #7c3aed;
+}
+
+.filter-option input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* Adicionado ou mantido para garantir que a classe hidden funcione */
+.hidden {
+  display: none !important;
 }

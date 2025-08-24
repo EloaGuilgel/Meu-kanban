@@ -10,7 +10,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kanban</title>
-    <!-- Link para arquivo CSS -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -60,6 +59,39 @@
               <ion-icon name="filter-outline"></ion-icon>
               <span>Filtrar</span>
             </button>
+            <div class="filter-menu hidden" id="filter-menu">
+              <div class="filter-option">
+                <label for="filter-todo">A fazer</label>
+                <input
+                  type="checkbox"
+                  id="filter-todo"
+                  data-filter-by="todo"
+                  checked
+                />
+                <span class="slider"></span>
+              </div>
+              <div class="filter-option">
+                <label for="filter-doing">Fazendo</label>
+                <input
+                  type="checkbox"
+                  id="filter-doing"
+                  data-filter-by="doing"
+                  checked
+                />
+                <span class="slider"></span>
+              </div>
+              <div class="filter-option">
+                <label for="filter-done">Feito</label>
+                <input
+                  type="checkbox"
+                  id="filter-done"
+                  data-filter-by="done"
+                  checked
+                />
+                <span class="slider"></span>
+              </div>
+              <button class="all-filter">Limpar filtro</button>
+            </div>
             <div class="input-wrapper">
               <ion-icon name="search-outline"></ion-icon>
               <input
@@ -69,10 +101,8 @@
             </div>
           </section>
           <section class="kanban">
-            <!-- Adicionando data-column-id para o JavaScript e a classe kanban-column -->
             <div class="todo kanban-column" data-column-id="todo">
               <h2>A fazer</h2>
-              <!-- Formulário para adicionar nova card - INICIALMENTE ESCONDIDO -->
               <div class="add-card-form hidden">
                 <input
                   type="text"
@@ -87,9 +117,7 @@
                 <button id="add-new-card-button-form-submit">
                   Adicionar Card
                 </button>
-                <!-- Novo ID para o botão de submissão do formulário -->
               </div>
-              <!-- Botão para INSERIR NOVA CARD (mostra o formulário) -->
               <button id="toggle-add-card-form" data-state="initial">
                 Inserir nova Card
               </button>
@@ -124,7 +152,6 @@
                 </div>
               </div>
             </div>
-            <!-- Adicionando data-column-id para o JavaScript e a classe kanban-column -->
             <div class="doing kanban-column" data-column-id="doing">
               <h2>Fazendo</h2>
               <div class="cards">
@@ -144,7 +171,6 @@
                 </div>
               </div>
             </div>
-            <!-- Adicionando data-column-id para o JavaScript e a classe kanban-column -->
             <div class="done kanban-column" data-column-id="done">
               <h2>Feito</h2>
               <div class="cards">
@@ -166,7 +192,6 @@
       </main>
     </div>
 
-    <!-- Scripts de bibliotecas -->
     <script
       type="module"
       src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
@@ -176,7 +201,6 @@
       src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-    <!-- Link para o  arquivo JavaScript -->
     <script src="script.js"></script>
   </body>
 </html>
